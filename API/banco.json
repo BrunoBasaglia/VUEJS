@@ -1,0 +1,39 @@
+{
+  "alunos": [
+    {
+      "id": 1,
+      "nome": "Bruno",
+      "sobrenome": "Basaglia"
+    },
+    {
+      "id": 2,
+      "nome": "Guilherme",
+      "sobrenome": "Basaglia"
+    },
+    {
+      "id": 3,
+      "nome": "Caroline",
+      "sobrenome": "Basaglia"
+    },
+    {
+      "nome": "Geni",
+      "sobrenome": "",
+      "id": 4
+    },
+    {
+      "nome": "Luci",
+      "sobrenome": "",
+      "id": 5
+    },
+    {
+      "nome": "Sergio",
+      "sobrenome": "",
+      "id": 6
+    },
+    {
+      "nome": "Iraci",
+      "sobrenome": "",
+      "id": 7
+    }
+  ]
+}
