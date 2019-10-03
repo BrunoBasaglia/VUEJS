@@ -1,9 +1,13 @@
 
 <template>
   <div>
-    <titulo texto="Alunos" />
-    <input type="text" placeholder="Nome do Aluno" v-model="nome" v-on:keyup.enter="addAluno()" />
-    <button style="margin-left:2em" class="btn-adicionar" @click="addAluno()">+ Adicionar</button>
+    <titulo
+      :texto="professorid != undefined ? 'Professor: '  + professor.nome : 'Todos os Alunos'"
+    />
+    <div v-if="professorid != undefined">
+      <input type="text" placeholder="Nome do Aluno" v-model="nome" v-on:keyup.enter="addAluno()" />
+      <button style="margin-left:2em" class="btn-adicionar" @click="addAluno()">+ Adicionar</button>
+    </div>
     <table class="table">
       <thead>
         <th>Matricula</th>
@@ -13,7 +17,7 @@
       <tbody v-if="alunos.length">
         <tr v-for="(aluno,index) in alunos" :key="index">
           <td>{{aluno.id}}</td>
-          <td>{{aluno.nome}}</td>
+          <router-link tag="td" :to="`/AlunoDetalhe/${aluno.id}`" style="cursor:pointer">{{aluno.nome}} {{aluno.sobrenome}}</router-link>
           <td>
             <button class="btn-remove" @click="remover(aluno)">Remover</button>
           </td>
@@ -34,29 +38,43 @@ export default {
   data() {
     return {
       titulo: "ALUNO",
-      // nome: "Alunos",
+      professorid: this.$route.params.prof_id,
+      professor: {},
+      nome: "",
       alunos: []
     };
   },
   created() {
-    this.$http
-      .get("http://localhost:3000/alunos")
-      .then(res => res.json())
-      .then(alunos => (this.alunos = alunos));
+    if (this.professorid) {
+      this.carregarProfessores();
+      this.$http
+        .get("http://localhost:3000/alunos?professor.id=" + this.professorid)
+        .then(res => res.json())
+        .then(alunos => (this.alunos = alunos));
+    } else {
+      this.$http
+        .get("http://localhost:3000/alunos")
+        .then(res => res.json())
+        .then(alunos => (this.alunos = alunos));
+    }
   },
   props: {},
   methods: {
     addAluno() {
       let _aluno = {
         nome: this.nome,
-        sobrenome: ""
+        sobrenome: "",
+        professor: {
+          id: this.professor.id,
+          nome: this.professor.nome
+        }
       };
       this.$http
         .post("http://localhost:3000/alunos", _aluno)
         .then(res => res.json())
         .then(alunoRetorno => {
           this.alunos.push(alunoRetorno);
-          this.nome = '';
+          this.nome = "";
         });
     },
     remover(aluno) {
@@ -64,6 +82,14 @@ export default {
         let indice = this.alunos.indexOf(aluno);
         this.alunos.splice(indice, 1);
       });
+    },
+    carregarProfessores() {
+      this.$http
+        .get("http://localhost:3000/professores/" + this.professorid)
+        .then(res => res.json())
+        .then(professor => {
+          this.professor = professor;
+        });
     }
   }
 };
@@ -73,74 +99,5 @@ export default {
 <style scoped>
 template {
   margin: 1em;
-}
-
-.btn-remove {
-  width: 50%;
-  background-color: #ff5050;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-adicionar {
-  width: 20%;
-  background-color: #4caf50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-input[type="text"],
-select {
-  width: 20%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.table {
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 80%;
-  margin-top: 1em;
-}
-
-.foot {
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  width: 160.5%;
-  height: 50px;
-  background-color: #ddd;
-  text-align: center;
-}
-
-.table td,
-.table th {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center !important;
-}
-
-.table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* .table tr:hover {background-color: #ddd;} */
-
-.table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #4caf50;
-  color: white;
 }
 </style>
